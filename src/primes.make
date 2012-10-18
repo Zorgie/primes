@@ -1,2 +1,2 @@
 primes.out : main.cpp
-	gcc main.cpp -lgmp
+	g++ main.cpp -lgmp
