@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <gmp.h>
 
 using namespace std;
@@ -9,7 +10,7 @@ int main(int argc, char* argv[])
 {
 	if(argc < 2)
 	{
-		printf("Please supply a number to factor.");
+		printf("Please supply a number to factor.\n");
 		return 1;
 	}
 
@@ -24,29 +25,26 @@ int main(int argc, char* argv[])
 	{
 		printf("Factor %d: %s\n", i+1, mpz_get_str(NULL, 10, factors[i+1]));
 	}
-
+	delete[] factors;
 	return 0;
 }
 
 
-
 mpz_t* fermatFactors(mpz_t N)
 {
-	printf("Factoring %s\n", mpz_get_str(NULL, 10, N));
+//	printf("Factoring %s\n", mpz_get_str(NULL, 10, N));
 	// N is already a prime number.
-	if(mpz_probab_prime_p(N, 15))
+	if(mpz_probab_prime_p(N, 10))
 	{
-		printf("sdfasd\n");
-		mpz_t* factors = new mpz_t[2];
-		printf("here");
+		mpz_t* factors = (mpz_t*)malloc(2*sizeof(mpz_t));
+		mpz_init(factors[0]);
+		mpz_init(factors[1]);
 		mpz_set_ui(factors[0], 1);
-		printf("here");
 		mpz_set(factors[1],N);
-		printf("here");
 		return factors;
 	}
 
-	printf("%s is not a prime number.\n", mpz_get_str(NULL, 10, N));
+//	printf("%s is not a prime number.\n", mpz_get_str(NULL, 10, N));
 	mpz_t a, b, b2, one;
 
 	mpz_init(a);
@@ -60,9 +58,9 @@ mpz_t* fermatFactors(mpz_t N)
 	mpz_mul(b2, a, a);
 	mpz_sub(b2, b2, N);
 
-	while(!mpz_perfect_square_p(b2))
+	while(!mpz_perfect_square_p(b2) && mpz_cmp(a, N) < 0)
 	{
-		printf("%s is not a square, trying the next number.\n", mpz_get_str(NULL, 10, b2));
+	//	printf("%s is not a square, trying the next number.\n", mpz_get_str(NULL, 10, b2));
 		mpz_add(b2, b2, a);
 		mpz_add(b2, b2, a);
 		mpz_add(b2, b2, one);
@@ -85,14 +83,19 @@ mpz_t* fermatFactors(mpz_t N)
 	quant1 = mpz_get_ui(first[0]);
 	quant2 = mpz_get_ui(second[0]);
 
-	mpz_t* factors = new mpz_t[quant1 + quant2];
+	mpz_t* factors = new mpz_t[quant1 + quant2 + 1];
+	for(int i=0; i<quant1 + quant2 + 1; i++)
+	{	
+		mpz_init(factors[i]);
+	}
+	mpz_set_ui(factors[0], quant1+quant2);
 	for(int i=0; i<quant1; i++)
 	{
-		mpz_set(factors[i], first[i+1]);
+		mpz_set(factors[i+1], first[i+1]);
 	}
 	for(int i=0; i<quant2; i++)
 	{
-		mpz_set(factors[i+quant1], second[i+1]);
+		mpz_set(factors[i+1+quant1], second[i+1]);
 	}
 	delete[] first;
 	delete[] second;
