@@ -1,0 +1,31 @@
+title
+
+Factorization
+
+Abstract
+
+
+Problem description
+
+
+Solution method
+	final method used for solving the problem. summarized, more accurately described below.
+
+Algorithms used
+	List Algorithm - how it works - Positive and negative sides - Kattis score, also tweaks and differences from the first implementation of the algorithm.
+
+Algorithms tried
+	If a algorithm is tried but fails, explain what is done to try to fix it or what the problem you cannot solve is.
+
+Algorithms Considered
+	What algorithms was considered to be used?
+	how do they work?
+	positive and negative sides...
+
+
+Comparison between algorithms
+
+
+Kattis results for different versions
+
+
