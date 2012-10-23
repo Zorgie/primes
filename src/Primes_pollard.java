@@ -66,7 +66,7 @@ public class Primes_pollard {
 		N = list1.remove(list1.size() - 1);
 
 		while (N.compareTo(ONE) > 0 && !(N.isProbablePrime(50))) {
-			BigInteger factor = pollard(N, 25000);
+			BigInteger factor = pollard(N, 12500);
 
 			// Needs factorization, pollard didn't find it.
 			// Quadratic Sieve, I choose you!
@@ -112,7 +112,7 @@ public class Primes_pollard {
 
 	public static ArrayList<BigInteger> runTD(BigInteger N) {
 		ArrayList<BigInteger> list = new ArrayList<BigInteger>();
-		N = trialDivision(N, 5000, list);
+		N = trialDivision(N, 500, list);
 		list.add(N);
 		return list;
 	}
@@ -123,7 +123,7 @@ public class Primes_pollard {
 		if (limit == 0)
 			limit = primes[primes.length - 1];
 		for (int i = 0; primes.length > i && primes[i] < limit; i++) {
-			if (N.isProbablePrime(5)) {
+			if (N.isProbablePrime(50)) {
 				list.add(N);
 				return BigInteger.ZERO;
 			}
@@ -141,7 +141,6 @@ public class Primes_pollard {
 	}
 
 	public static BigInteger pollard(BigInteger N, long timeLimit) {
-		long start = System.currentTimeMillis();
 		BigInteger x = BigInteger.valueOf(2);
 		BigInteger y = BigInteger.valueOf(2);
 		BigInteger D = BigInteger.valueOf(1);
