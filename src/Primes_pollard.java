@@ -1,7 +1,3 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -16,31 +12,22 @@ import java.util.Queue;
  */
 public class Primes_pollard{
 
-	ArrayList<BigInteger> list;
+
 	final static BigInteger ZERO =  new BigInteger("0");
 	final static BigInteger ONE = new BigInteger("1");
 	final static BigInteger TWO = new BigInteger("2");
 	static long startTime;
-	long innerTime, innerLimit;
+	static Kattio io = new Kattio(System.in, System.out);
 
 	
-	public Primes_pollard(long t , long l){
-		list = new ArrayList<BigInteger>();
-		innerTime = t;
-		innerLimit = l;
-
+	public Primes_pollard(){
 	}
 	
 	public static void main(String[] args) {
-		
-		
-
-		Kattio io = new Kattio(System.in, System.out);
-		
 		ArrayList<String> numberlist = new ArrayList<String>();
 		startTime = System.currentTimeMillis();		
 		
-		for(int i=0;i<100;i++){
+		for(int i=0;i<1;i++){
 			numberlist.add(io.getWord());
 			//System.err.println("reading");
 		}		
@@ -56,37 +43,31 @@ public class Primes_pollard{
 				continue;
 			}
 			BigInteger N = new BigInteger(str);
-			Primes_pollard p = new Primes_pollard(System.currentTimeMillis(), 200);
+			ArrayList<BigInteger> list = new ArrayList<BigInteger>();
 			
-			N = p.trialDivision(N,ZERO);
-			if(!N.equals(ZERO)){
-			Queue<BigInteger> q = new LinkedList<BigInteger>();
-			q.add(N);
-			while(!q.isEmpty()){
-				N = q.poll();
-				if(N.isProbablePrime(5)){
-					p.list.add(N);
-					continue;
-				}
-				BigInteger D = p.pollardWiki(N);
-				if(D.equals(ZERO)){
-					io.println("fail\n");
-					continue outerloop;
-				}
-				q.add(D);
-				N = N.divide(D);
-				q.add(N);
-			}
+			ArrayList<BigInteger> list1 = runTD(N);
+			N = list1.get(list1.size()-1);
+			list1.remove(list1.size()-1);
+			
+			if(!(N.isProbablePrime(5))){
+			ArrayList<BigInteger> list2 = runPollard(N);
+			list1.addAll(list2);
 			}
 			
 			
-			if(p.list.size() == 0){
+			
+			
+			
+			
+			
+			
+			if(list1.size() == 0){
 				io.println("fail");
 			}
-			for(int i=0; i < p.list.size(); i++)
+			for(int i=0; i < list1.size(); i++)
 			{
 				
-				io.println(p.list.get(i));
+				io.println(list1.get(i));
 				
 			}
 			io.println("");
@@ -95,10 +76,17 @@ public class Primes_pollard{
 
 	}
 
-
+	public static ArrayList<BigInteger> runTD(BigInteger N){
+		ArrayList<BigInteger> list = new ArrayList<BigInteger>();
+		N = trialDivision(N,ZERO,list);
+		list.add(N);
+		return list;
+		
+	}
+	
 
 // seems relevant to the report to have a naive implementation just to see how it would peform compared to the other algorithms
-	public BigInteger trialDivision(BigInteger N, BigInteger limit)
+	public static BigInteger trialDivision(BigInteger N, BigInteger limit, ArrayList<BigInteger> list)
 	{
 		if(limit.equals(ZERO)){
 			limit = BigInteger.valueOf(primes.length);
@@ -115,13 +103,9 @@ public class Primes_pollard{
 				N = tmp[0];
 				i--;
 			}
-			if(System.currentTimeMillis()-innerTime > innerLimit){
-				//System.err.println("time limit reached");
-				return ZERO;
-			}
 		}
 		BigInteger i = BigInteger.valueOf(primes[primes.length-1]);
-		
+		/*
 		for(;limit.compareTo(i)>0;i=i.add(TWO)){
 			if(N.isProbablePrime(5)){
 				list.add(N);
@@ -139,51 +123,54 @@ public class Primes_pollard{
 				return ZERO;
 			}
 			
-		}
+		}*/
 		return N;
+		
+	}
+	public static ArrayList<BigInteger> runPollard(BigInteger N){
+		return runPollard(N, 14800);
+		
+	}
+	
+	public static ArrayList<BigInteger> runPollard(BigInteger N,long timeLimit){
+		long startTime = System.currentTimeMillis();
+		ArrayList<BigInteger> list = new ArrayList<BigInteger>();
+		
+		if(!N.equals(ZERO)){
+			Queue<BigInteger> q = new LinkedList<BigInteger>();
+			q.add(N);
+			while(!q.isEmpty()){
+				if(System.currentTimeMillis()-startTime > timeLimit){
+					//System.err.println("time limit reached");
+					break;
+				}
+				N = q.poll();
+				if(N.isProbablePrime(5)){
+					list.add(N);
+					continue;
+				}
+				BigInteger D = pollard(N);
+				if(D.equals(ZERO)){
+					io.println("fail\n");
+					break;
+				}
+				q.add(D);
+				N = N.divide(D);
+				q.add(N);
+			}
+			}
+		return list;
 		
 	}
 
 
-public BigInteger pollard(BigInteger N){
-	
-	ArrayList<BigInteger> x = new ArrayList<BigInteger>();
-	x.add(0,new BigInteger("1"));
-	int i = 1;
-	int calc = 4;
-	while (true)
-	{
-		if(System.currentTimeMillis()-innerTime > innerLimit){
-			return ZERO;
-		}
-		for(int iter=i;iter<calc;iter++){
-			if(x.size()<= iter){
-				x.add(iter,((x.get(iter-1).multiply(x.get(iter-1))).add(BigInteger.valueOf(1))).mod(N));
-			}
-		}
-		calc = (i+2)*2;
-		BigInteger y = x.get(2*i).subtract(x.get(i));
-		BigInteger D = (y).gcd(N);
-		//System.out.println("N: " + N + " D: " + D);
-		if(D.compareTo(ONE)>0){
-			return D;
-		}
-		i++;
-	}
-	
-	
-}
-
-public BigInteger pollardWiki(BigInteger N){
+public static BigInteger pollard(BigInteger N){
 	
 	BigInteger x = BigInteger.valueOf(2);
 	BigInteger y = BigInteger.valueOf(2);
 	BigInteger D = BigInteger.valueOf(1);
 	while (D.equals(ONE))
 	{
-		if(System.currentTimeMillis()-innerTime > innerLimit){
-			return ZERO;
-		}
 		x = pollardFunc(x,N);
 		y = pollardFunc(pollardFunc(y,N),N);
 		D = (x.subtract(y)).gcd(N);
@@ -196,51 +183,12 @@ public BigInteger pollardWiki(BigInteger N){
 	return ZERO;
 }
 
-public BigInteger pollardFunc(BigInteger t, BigInteger N){
+static public BigInteger pollardFunc(BigInteger t, BigInteger N){
 	return ((t.multiply(t)).add(ONE)).mod(N);
 }
 
-public BigInteger [] Fermat(BigInteger N){
-	BigInteger x = sqrt(N);
 
-	for(;N.compareTo(x)>0;x=x.add(ONE)){
-		BigInteger ySquared = (x.multiply(x)).subtract(N);
-		if(isSquare(ySquared)){
-			BigInteger y = sqrt(ySquared);
-			BigInteger s = x.subtract(y);
-			BigInteger t = x.add(y);
-
-			BigInteger [] tmp = {s,t};
-			//System.out.println("returning: " + s + " and " + t);
-			return tmp;
-		}
-
-	}
-	BigInteger [] tmp = {ZERO,ZERO};
-	return tmp;
-}
-
-public BigInteger sqrt(BigInteger N){
-	if(N.compareTo(new BigInteger(Long.MAX_VALUE+""))<=0){
-		Long tmp = N.longValue();
-		return new BigInteger((long)Math.sqrt(tmp)+"");
-	}
-	return N.divideAndRemainder(TWO)[0];
-}
-
-public boolean isSquare(BigInteger N){
-	if(N.compareTo(ZERO)<0){
-		return false;
-	}
-	BigInteger root = sqrt(N);
-	//System.out.println(root + "    " + N);
-	if(N.equals(root.multiply(root))){
-		return true;
-	}
-	return false;
-}
-
-int[] primes={
+static int[] primes={
 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 ,
 31, 37, 41, 43, 47, 53, 59, 61, 67, 71 ,
 73,  79,  83,  89,  97, 101, 103, 107, 109, 113 ,
