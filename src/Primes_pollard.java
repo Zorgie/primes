@@ -29,16 +29,20 @@ public class Primes_pollard {
 		}
 
 		boolean failtrigger = false;
-		System.err.println("calculating");
+		// System.err.println("calculating");
 		int solved = 0;
+		boolean first = true;
 		outer: for (String str : numberlist) {
-			solved++;
-			io.println();
+			if (first) {
+				first = false;
+			} else {
+				io.println();
+			}
 			innerStartTime = System.currentTimeMillis();
 
 			if (System.currentTimeMillis() - startTime > 14000) {
 				if (!failtrigger) {
-					System.err.println("Solved " + solved + " numbers");
+					// System.err.println("Solved " + solved + " numbers");
 					failtrigger = true;
 				}
 				// System.err.println("time limit reached");
@@ -52,12 +56,12 @@ public class Primes_pollard {
 			N = list1.remove(list1.size() - 1);
 
 			while (N.compareTo(ONE) > 0 && !(N.isProbablePrime(50))) {
-				BigInteger factor = pollard(N, 2000);
+				BigInteger factor = pollard(N, 20000);
 
 				// Needs factorization, pollard didn't find it.
 				// Quadratic Sieve, I choose you!
 				if (factor.equals(ZERO)) {
-					// io.println("fail\n");
+					// io.println("fail");
 					// continue outer;
 					while (!N.isProbablePrime(50)) {
 						QS qs = new QS(N);
@@ -72,7 +76,7 @@ public class Primes_pollard {
 				}
 			}
 
-			if (!N.equals(ZERO) && !N.equals(ONE))
+			if (N.compareTo(ONE) > 0)
 				list1.add(N);
 
 			// No factors were found. FAIL!
@@ -91,6 +95,7 @@ public class Primes_pollard {
 				}
 			}
 			if (!fail && check.equals(counter)) {
+				solved++;
 				// Prints the factors that was found.
 				for (int i = 0; i < list1.size(); i++) {
 					io.println(list1.get(i));
@@ -99,6 +104,7 @@ public class Primes_pollard {
 				io.println("fail");
 			}
 		}
+		// System.err.println("Solved: " + solved);
 		io.flush();
 		io.close();
 
@@ -106,7 +112,7 @@ public class Primes_pollard {
 
 	public static ArrayList<BigInteger> runTD(BigInteger N) {
 		ArrayList<BigInteger> list = new ArrayList<BigInteger>();
-		N = trialDivision(N, 1000, list);
+		N = trialDivision(N, 2000, list);
 		list.add(N);
 		return list;
 	}

@@ -66,7 +66,7 @@ public class QS {
 			flattenFactor = 10;
 			iterationLimit = 15000;
 		} else {
-			PRIME_BASE = 900;
+			PRIME_BASE = 1000;
 			flattenFactor = 20;
 			iterationLimit = 20000;
 		}
