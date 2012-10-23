@@ -37,7 +37,7 @@ public class QS {
 		List<BigInteger> factors = new LinkedList<BigInteger>();
 		while (!N.isProbablePrime(50)) {
 			QS qs = new QS(N);
-			BigInteger factor = qs.quadraticSieve();
+			BigInteger factor = qs.quadraticSieve(0);
 			if (factor.isProbablePrime(50)) {
 				factors.add(factor);
 				N = N.divide(factor);
@@ -60,6 +60,19 @@ public class QS {
 	public QS(BigInteger toFactor) {
 		this.N = toFactor;
 
+		// flattenFactor = 20;
+
+		// double logn = N.bitLength() * Math.log(2);
+		// PRIME_BASE = (int) (Math.pow(Math.E, 0.5 * Math.sqrt((logn *
+		// Math.log(logn)))) / 2);
+		//
+		// if (PRIME_BASE > 1500)
+		// PRIME_BASE = 1500;
+		//
+		// while (PRIME_BASE % flattenFactor != 0) {
+		// PRIME_BASE++;
+		// }
+		// iterationLimit = 20000;
 		int bitCount = N.bitLength();
 		if (bitCount < 85) {
 			PRIME_BASE = 500;
@@ -100,7 +113,7 @@ public class QS {
 		}
 	}
 
-	public BigInteger quadraticSieve() {
+	public BigInteger quadraticSieve(long looplimit) {
 		// The size of various computational vectors.
 
 		// Smooth number pairs
