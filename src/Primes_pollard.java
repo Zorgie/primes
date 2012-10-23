@@ -57,13 +57,6 @@ public class Primes_pollard{
 			
 			}
 			
-			
-			
-			
-			
-			
-			
-			
 			if(list1.size() == 0){
 				io.println("fail");
 			}
@@ -94,17 +87,17 @@ public class Primes_pollard{
 // seems relevant to the report to have a naive implementation just to see how it would peform compared to the other algorithms
 	public static BigInteger trialDivision(BigInteger N, BigInteger limit, ArrayList<BigInteger> list)
 	{
-		if(limit.equals(ZERO)){
+		if(limit.equals(BigInteger.ZERO)){
 			limit = BigInteger.valueOf(primes.length);
 		}
 		for(int i = 0; limit.compareTo(BigInteger.valueOf(primes[i]))>0 && primes.length>i;i++){
 			if(N.isProbablePrime(5)){
 				list.add(N);
-				return ZERO;
+				return BigInteger.ZERO;
 			}
 			BigInteger prime = BigInteger.valueOf(primes[i]);
 			BigInteger [] tmp = N.divideAndRemainder(prime);
-			if(tmp[1].equals(ZERO)){
+			if(tmp[1].equals(BigInteger.ZERO)){
 				list.add(prime);
 				N = tmp[0];
 				i--;
@@ -122,25 +115,25 @@ public static BigInteger pollard(BigInteger N, long timeLimit){
 	BigInteger x = BigInteger.valueOf(2);
 	BigInteger y = BigInteger.valueOf(2);
 	BigInteger D = BigInteger.valueOf(1);
-	while (D.equals(ONE))
+	while (D.equals(BigInteger.ONE))
 	{
 		if(System.currentTimeMillis() - start < timeLimit){
-			return ZERO;
+			return BigInteger.ZERO;
 		}
 		x = pollardFunc(x,N);
 		y = pollardFunc(pollardFunc(y,N),N);
 		D = (x.subtract(y)).gcd(N);
 		
 		//System.out.println("N: " + N + " D: " + D);
-		if(D.compareTo(ONE)>0){
+		if(D.compareTo(BigInteger.ONE)>0){
 			return D;
 		}
 	}
-	return ZERO;
+	return BigInteger.ZERO;
 }
 
 static public BigInteger pollardFunc(BigInteger t, BigInteger N){
-	return ((t.multiply(t)).add(ONE)).mod(N);
+	return ((t.multiply(t)).add(BigInteger.ONE)).mod(N);
 }
 
 
