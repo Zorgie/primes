@@ -17,6 +17,8 @@ public class Primes_pollard{
 	final static BigInteger ONE = new BigInteger("1");
 	final static BigInteger TWO = new BigInteger("2");
 	static long startTime;
+	static long timeLimit;
+	static long innerStartTime;
 	static Kattio io = new Kattio(System.in, System.out);
 
 	
@@ -27,14 +29,15 @@ public class Primes_pollard{
 		ArrayList<String> numberlist = new ArrayList<String>();
 		startTime = System.currentTimeMillis();		
 		
-		for(int i=0;i<1;i++){
+		for(int i=0;i<100;i++){
 			numberlist.add(io.getWord());
 			//System.err.println("reading");
 		}		
 		
 		System.err.println("calculating");
-		outerloop:for(String str : numberlist)
+		for(String str : numberlist)
 		{
+			innerStartTime = System.currentTimeMillis();
 			
 			if(System.currentTimeMillis()-startTime > 14800){
 				//System.err.println("time limit reached");
@@ -50,8 +53,8 @@ public class Primes_pollard{
 			list1.remove(list1.size()-1);
 			
 			if(!(N.isProbablePrime(5))){
-			ArrayList<BigInteger> list2 = runPollard(N);
-			list1.addAll(list2);
+			BigInteger list2 = pollard(N,100);
+			
 			}
 			
 			
@@ -79,8 +82,11 @@ public class Primes_pollard{
 	public static ArrayList<BigInteger> runTD(BigInteger N){
 		ArrayList<BigInteger> list = new ArrayList<BigInteger>();
 		N = trialDivision(N,ZERO,list);
-		list.add(N);
-		return list;
+		if(list.size()>0){
+			list.add(N);
+			return list;
+		}
+		return null;
 		
 	}
 	
@@ -105,72 +111,22 @@ public class Primes_pollard{
 			}
 		}
 		BigInteger i = BigInteger.valueOf(primes[primes.length-1]);
-		/*
-		for(;limit.compareTo(i)>0;i=i.add(TWO)){
-			if(N.isProbablePrime(5)){
-				list.add(N);
-				return ONE;
-			}
-			BigInteger [] tmp = N.divideAndRemainder(i);
-			if(tmp[1].equals(ZERO)){
-				list.add(i);
-				N = tmp[0];
-				i.subtract(TWO);
-			}
-			
-			if(System.currentTimeMillis()-innerTime > innerLimit){
-				//System.err.println("time limit reached");
-				return ZERO;
-			}
-			
-		}*/
 		return N;
 		
 	}
-	public static ArrayList<BigInteger> runPollard(BigInteger N){
-		return runPollard(N, 14800);
-		
-	}
 	
-	public static ArrayList<BigInteger> runPollard(BigInteger N,long timeLimit){
-		long startTime = System.currentTimeMillis();
-		ArrayList<BigInteger> list = new ArrayList<BigInteger>();
-		
-		if(!N.equals(ZERO)){
-			Queue<BigInteger> q = new LinkedList<BigInteger>();
-			q.add(N);
-			while(!q.isEmpty()){
-				if(System.currentTimeMillis()-startTime > timeLimit){
-					//System.err.println("time limit reached");
-					break;
-				}
-				N = q.poll();
-				if(N.isProbablePrime(5)){
-					list.add(N);
-					continue;
-				}
-				BigInteger D = pollard(N);
-				if(D.equals(ZERO)){
-					io.println("fail\n");
-					break;
-				}
-				q.add(D);
-				N = N.divide(D);
-				q.add(N);
-			}
-			}
-		return list;
-		
-	}
 
 
-public static BigInteger pollard(BigInteger N){
-	
+public static BigInteger pollard(BigInteger N, long timeLimit){
+	long start = System.currentTimeMillis();
 	BigInteger x = BigInteger.valueOf(2);
 	BigInteger y = BigInteger.valueOf(2);
 	BigInteger D = BigInteger.valueOf(1);
 	while (D.equals(ONE))
 	{
+		if(System.currentTimeMillis() - start < timeLimit){
+			return ZERO;
+		}
 		x = pollardFunc(x,N);
 		y = pollardFunc(pollardFunc(y,N),N);
 		D = (x.subtract(y)).gcd(N);
