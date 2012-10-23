@@ -14,7 +14,9 @@ public class QS {
 
 	// Fields
 	private BigInteger[] bigPrimes;
+	private int[] primes;
 	private double[] primeLogs;
+	private BigInteger N;
 	BigInteger[] s;
 	BigInteger[] fs;
 	double[] logs;
@@ -22,20 +24,19 @@ public class QS {
 	int decomposedCount;
 
 	public static void main(String[] args) {
-		QS qs = new QS();
 		for (String s : args) {
-			List<BigInteger> factors = qs.getFactors(new BigInteger(s));
-			System.out.println();
-			for (BigInteger bi : factors) {
+			List<BigInteger> list = getFactors(new BigInteger(s));
+			for(BigInteger bi : list){
 				System.out.println(bi);
 			}
 		}
 	}
 
-	public List<BigInteger> getFactors(BigInteger N) {
+	public static List<BigInteger> getFactors(BigInteger N) {
 		List<BigInteger> factors = new LinkedList<BigInteger>();
 		while (!N.isProbablePrime(50)) {
-			BigInteger factor = quadraticSieve(N);
+			QS qs = new QS(N);
+			BigInteger factor = qs.quadraticSieve();
 			if (factor.isProbablePrime(50)) {
 				factors.add(factor);
 				N = N.divide(factor);
@@ -55,23 +56,47 @@ public class QS {
 		System.out.println(s);
 	}
 
-	public QS() {
+	public QS(BigInteger toFactor) {
+		this.N = toFactor;
 		// Initializes an array of the first <PRIME_BASE> prime numbers, in
 		// BigInteger form.
 		bigPrimes = new BigInteger[PRIME_BASE];
 		primeLogs = new double[PRIME_BASE];
-		int i = 0;
+		primes = new int[PRIME_BASE];
+		primes[0] = -1;
+		bigPrimes[0] = BigInteger.valueOf(-1);
+		primeLogs[0] = 0;
+		int i = 1;
+		int j = 1;
+		while(j < PRIME_BASE){
+			// Analyzes the next prime from the raw array.
+			int testPrime = PRIMES_RAW[i];
+			BigInteger bigPrime = BigInteger.valueOf(testPrime);
+			
+			// Calculates N % p, where p is our prime for testing.
+			int nModP = N.mod(bigPrime).intValue();
+			
+			// Checks if the prime is a Quadratic residue of N.
+			if(legendreSymbol(nModP, testPrime) == 1){
+				primes[j] = testPrime;
+				bigPrimes[j] = bigPrime;
+				primeLogs[j] = Math.log(testPrime);
+				j++;
+			}
+			i++;
+		}
 	}
 
-	public BigInteger quadraticSieve(BigInteger N) {
+	public BigInteger quadraticSieve() {
+		// The size of various computational vectors.
 		int iterationLimit = 2000000;
 
+		// Smooth number pairs
 		int smoothNumbers[][] = new int[PRIME_BASE][2];
 
+		// Vector of decomposed numbers.
 		decomposedNumbers = new Vector();
 		decomposedCount = 0;
-
-		println("step 1");
 
 		// Congruences
 		for (int i = 1; i < PRIME_BASE; i++) {
@@ -80,15 +105,21 @@ public class QS {
 			smoothNumbers[i][1] = (int) smooth[1];
 		}
 
-		int offset = 0;
-		int direction = 0;
-		BigInteger m = sqrt(N).add(ONE);
+		// m = The root of N, rounded up.
+		BigInteger m = sqrt(N);
 
+		// This will be a large vectors of "random" numbers
 		s = new BigInteger[iterationLimit + 2];
+		
+		// This will be the "random" numbers squared modulo 
 		fs = new BigInteger[iterationLimit + 2];
 		logs = new double[iterationLimit + 2];
+		
+		
+		int direction = 0;
+		int offset = 0;
 		do {
-
+			
 			switch (direction) {
 			case 0:
 				direction = 1;
@@ -110,12 +141,16 @@ public class QS {
 				logs[i] = 0;
 			}
 
+			// Recalculates the s, sf and log vectors.
 			for (int i = 1; i < PRIME_BASE; i++) {
 
-				println("i: " + i);
-
+				// The prime to look at.
 				int p = primes[i];
+				
+				// The logarithm of this prime.
 				double logp = primeLogs[i];
+				
+				// The M-value % p + offset.
 				int mInt = m.mod(bigPrimes[i]).intValue() + offset;
 
 				if (smoothNumbers[i][0] >= 0) {
@@ -138,6 +173,7 @@ public class QS {
 				}
 			}
 
+			
 			double TARGET = (double) (Math.log(m.doubleValue()) + Math.log(iterationLimit) - primeLogs[PRIME_BASE - 1]);
 
 			for (int i = 0; i < iterationLimit; i++) {
@@ -183,7 +219,7 @@ public class QS {
 					break;
 			}
 
-			println("" + decomposedCount + " decomposed.");
+			//println("" + decomposedCount + " decomposed.");
 
 		} while (decomposedCount < PRIME_BASE + bitChunkSize);
 
@@ -378,9 +414,7 @@ public class QS {
 	}
 
 	private long[] findSmoothNumbers(long p, long n) {
-		long j, k, x;
-		BigInteger test;
-		BigInteger prim = BigInteger.valueOf(p);
+		long k, x;
 
 		long result[] = new long[2];
 		result[0] = -1;
