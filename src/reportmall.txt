@@ -1,31 +1,167 @@
 title
+Project 1
+Advanced Algorithms
+
+By:
+Lucas Taubert	900120-4776
+Tim Malmström	910127-2814
 
 Factorization
 
-Abstract
 
+Abstract
+The goal of the problem is to be able to factorize as many numbers as possible
+on the test server "Kattis", doing so by implementing efficient factorization
+algorithms. Our solution is built on combining 3 different factorization
+algorithms together to use the appropriate algorithm for the appropriate
+situation. The results that we achieved doing so were to be able to factorize
+xx/100 big integers on the test server.
 
 Problem description
+The problem given to solve is a problem that has been a mathematical
+challenge for a long time. To factorize big integers. What factorizing means
+considering integers is to decompose (split) them into as small factors as
+possible resulting in a list of factors that together multiply into the given
+number. The factorizing of an integer is completed if all factors are
+primes(there is no way of factorizing the factors themselves).
+
+The restrictions for the project was that the implementation of the
+factorization had to be in either Java, C or C++. As help for solving the
+problem there are librarys that contain the basic arithmetics for big integers
+in programming.
+
+The problem is evaluated by running the solution on an external server called
+Kattis, which tries to factorize 100 numbers within 15 seconds and returns the
+result to the sender.
 
 
-Solution method
-	final method used for solving the problem. summarized, more accurately described below.
+Project progression
+This chapter contains the progress of our work and what algorithms and
+programming languages we used in our solution. Algorithms metioned in this
+chapter will be described in more detail in chapter XXX Algorithms.
+	The first thing we did in the creation of our solution was to plan our
+first approach to the problem aswell as which result we were going to aim for.
+As expressed in many webpages one of the best solutions of the facotrization
+problem is the quadratic sieve, which was what we hoped to achieve a
+implementation of but since it's known to be difficult to implement we decided
+to start by using one of the easier algorithms.
+	At first our decision was to implement the solution using C++. We
+decided to start by implementing the naive solution to the problem which is by
+using trial division. We decided to implement this since it was a good way to
+get started working on the project even though we didn't think it would help
+in the end. We also tried some improvements to the naive algorithm i.e. by
+using trial division from a preconfigured list of primes. As mentioned the
+naive solution was not part of our plan for the final solution and we then
+continued by trying to implement Fermats Factorization.
+	When implementing this more advanced algorithm we encountered a lot of
+errors with using C++ since noone in the project group had any previous
+knowledge about implementing advanced algorithms in C++, but were planning to
+get some training in this with this project. When we realised the complexity
+of this problem we then decided to use the programming environment that both
+were most comfortable with which is programming Java in the Eclipse IDE. After
+switching programming language and environment we continued with the
+implementations of Fermats factorizations and also looked a bit on the Pollard
+rho algorithm. We implemented both of those getting the Pollard algorithm to
+run efficiently and still improving our Fermats solution. Problems we
+encountered with the Fermats solution was calculating the square root of a
+BigInteger in java. At the same time as we kept improving on the Fermats
+algorithm we also started looking at the quadratic sieve since it was our
+primary goal in the project. 
+
+
 
 Algorithms used
-	List Algorithm - how it works - Positive and negative sides - Kattis score, also tweaks and differences from the first implementation of the algorithm.
+	The algorithms we used during the project were
+
+	Naive trial division
+The first algorithm we used was the naive solution of trial division.
+
+Trial division takes the number N to factorize, and then tries for
+every number smaller than the square root of N to divide N. If the tested
+number proves to be a factor of N it divides N by the given number and saves
+said number into a list of factors continuing the algorithm too see if the new
+N is divisable by the same number.
+	Pseudocode
+		trialDivision(N)
+		L = empty list;
+		for i = 2 to sqrt(N);
+			if i divides N
+				add i to L;
+				N = N/i;
+			continue with i;
+			else
+				next i;
+
+	Naive trial division using a list of primes.
+An optimization of the previous algorithm is the trial division using a list
+of primes, where instead of trying to divide the number N by all number less
+than the square root of N tries to divide N by all primes smaller than the square
+root of N. This is better than the previous algorithm since it needs to
+perform less divisions for each number N, but since our algorithm got it's
+prime values from a preconfigured list of primes it was limited since it had
+no way of calculating numbers when it needed more primes.
+	We implemented this improvement since we realised that this algorithm
+is really fast when searching for small factors, which can be used to improve
+the more advanced algorithms that can more efficiently get the bigger factors.					
+	
+Pollard rho - should probably rewrite this, mostly taken from wikipedia
+
+Pollard rho is a probabilistic algorithm that finds one non trivial factor d in the given
+number N and returns that factor. The Pollard rho algorithm is based on the
+observation that there are two numbers x and y which are congruent modulo d if
+d is a factor of N. The algorithm then uses this assumption to find d by the
+condition that d = gcd(|x-y|,N). To find D the function uses a function modulo
+n as a generator of a pseudo random sequence, for both x and y.
+
+Fermats Factorization Algorithm
+
+
+Quadratic sieve
+
+
+
+
+Combinations of algorithms
+Since the different algorithms performance is based a lot on the circumstances
+i.e. trial division is good for finding small factors while Quadratic sieve is
+more optimized on finding the bigger factors, the best overall performance is
+to combine the different algorithms and run the one best suited for the
+current number being factorized.
+
+Naive trial division combined with the Pollard
+This combination proved successful when testing by first using the trial
+Division using a list of primes to get some of the smaller factors and then
+passing the rest from that algorithm on to the pollard algorithm since it has
+a better performance in finding the bigger non trivial factors of a number.
+
+The best combination was a combination of both the trial division, the Pollard
+rho algorithm and the quadratic sieve algorithm, since they all have their
+different areas of expertise. The trial division calculates the smallest
+factors of then number, then the pollard rho algorithm tries to find any "mid
+range" factors from the number, after which the quadratic sieve is run trying
+to find the last and biggest factors of the number.
 
 Algorithms tried
-	If a algorithm is tried but fails, explain what is done to try to fix it or what the problem you cannot solve is.
+Fermats factorization - fails on the fact that we don't have any good
+implementation on sqrt for BigInteger in java
+	
+Comparison
+We did not send in all of the different algorithms to kattis separately, but we
+tried some of them and the results we got were:
 
-Algorithms Considered
-	What algorithms was considered to be used?
-	how do they work?
-	positive and negative sides...
+trial division using the list of primes: 19/100 numbers factorized in Kattis.
+Trial division using the list of primes combined with the Pollard algorithm
+for finding the bigger factors: 48/100 numbers factorized in Kattis.
+Trial division using the list of primes combined with the Pollard rho
+algorithm and the Quadratic sieve algorithm: xxx/100.
 
 
-Comparison between algorithms
+Final solution	
+The final method that we used for solving the problem was XXXXX since it
+achieved the highest score when tested in "Kattis"
+	final method used for solving the problem. summarized, more accurately described below.
+	
 
-
-Kattis results for different versions
+Conclusions
 
 
