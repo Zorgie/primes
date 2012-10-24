@@ -129,25 +129,8 @@ public class QS {
 
 		logs = new double[iterationLimit + 2];
 
-		int direction = 0;
 		int offset = 0;
 		do {
-			// Decides parameters for finding the next s/fs-values.
-			switch (direction) {
-			case 0:
-				direction = 1;
-				offset = 0;
-				break;
-			case 1:
-				direction = -1;
-				offset = -offset + iterationLimit;
-				break;
-			case -1:
-				direction = 1;
-				offset = -offset;
-				break;
-			}
-
 			// Cleans the s/vs/logs-arrays.
 			for (int i = 0; i < iterationLimit; i++) {
 				s[i] = null;
@@ -155,7 +138,7 @@ public class QS {
 				logs[i] = 0;
 			}
 
-			// Recalculates the s, sf and log vectors.
+			// Sieves <iterationLimit> numbers, offset by a specified amount.
 			for (int i = 1; i < PRIME_BASE; i++) {
 
 				// The prime to look at.
@@ -245,6 +228,7 @@ public class QS {
 				if (decomposedCount >= PRIME_BASE + flattenFactor)
 					break;
 			}
+			offset += iterationLimit;
 
 			// Keeps looping until enough congruences are checked and
 			// decomposed.
